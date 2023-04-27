@@ -1,8 +1,11 @@
 package com.countlesswrongs.myshoppinglist.domain.usecase
 
-class EditShopItemUseCase {
+import com.countlesswrongs.myshoppinglist.domain.ShopListRepository
+import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 
-    fun editShopItem(shopItemId: Int) {
-        TODO()
+class EditShopItemUseCase(private val shopListRepository: ShopListRepository) {
+
+    fun editShopItem(shopItem: ShopItem) {
+        shopListRepository.editShopItem(shopItem)
     }
 }
