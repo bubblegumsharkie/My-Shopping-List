@@ -1,8 +1,15 @@
 package com.countlesswrongs.myshoppinglist.domain.model
 
+
 data class ShopItem(
-    val id: Int,
     val name: String,
     val amount: Int,
-    val isOn: Boolean
-)
+    val isOn: Boolean,
+    var id: Int = UNDEFINED_ID
+) {
+
+    companion object {
+
+        const val UNDEFINED_ID = -1
+    }
+}
