@@ -11,6 +11,13 @@ import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 
 class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>() {
 
+    companion object {
+
+        const val VIEW_TYPE_ENABLED = 101
+        const val VIEW_TYPE_DISABLED = 102
+        const val MAX_POOL_SIZE = 15
+    }
+
     var shopItemList = listOf<ShopItem>()
         set(value) {
             field = value
@@ -18,9 +25,15 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
+        val layoutId =
+            when (viewType) {
+                VIEW_TYPE_DISABLED -> R.layout.item_shop_disabled
+                VIEW_TYPE_ENABLED -> R.layout.item_shop_enabled
+                else -> throw RuntimeException("Unknown view type: $viewType")
+            }
         val view = LayoutInflater
             .from(parent.context)
-            .inflate(R.layout.item_shop_enabled, parent, false)
+            .inflate(layoutId, parent, false)
         return ShopItemViewHolder(view)
     }
 
@@ -34,9 +47,17 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
         return shopItemList.size
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return if (shopItemList[position].enabled) {
+            VIEW_TYPE_ENABLED
+        } else {
+            VIEW_TYPE_DISABLED
+        }
+    }
+
     class ShopItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textViewItemName: TextView = view.findViewById<TextView>(R.id.textViewItemName)
-        val textViewItemCount: TextView = view.findViewById<TextView>(R.id.textViewItemCount)
+        val textViewItemName: TextView = view.findViewById(R.id.textViewItemName)
+        val textViewItemCount: TextView = view.findViewById(R.id.textViewItemCount)
     }
 
 }
