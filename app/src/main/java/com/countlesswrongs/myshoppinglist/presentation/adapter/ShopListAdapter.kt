@@ -12,11 +12,12 @@ import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>() {
 
     companion object {
-
         const val VIEW_TYPE_ENABLED = 101
         const val VIEW_TYPE_DISABLED = 102
         const val MAX_POOL_SIZE = 15
     }
+
+    var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
 
     var shopItemList = listOf<ShopItem>()
         set(value) {
@@ -41,6 +42,10 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
         val shopItem = shopItemList[position]
         holder.textViewItemName.text = shopItem.name
         holder.textViewItemCount.text = shopItem.amount.toString()
+        holder.itemView.setOnLongClickListener {
+            onShopItemLongClickListener?.invoke(shopItem)
+            true
+        }
     }
 
     override fun getItemCount(): Int {

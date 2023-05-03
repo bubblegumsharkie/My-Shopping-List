@@ -38,7 +38,12 @@ class MainActivity : AppCompatActivity() {
                 ShopListAdapter.MAX_POOL_SIZE
             )
         }
+
+        shopListAdapter.onShopItemLongClickListener = {
+            viewModel.changeShopItemStatus(it)
+        }
+
     }
 
-
 }
+
