@@ -18,6 +18,7 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
     }
 
     var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
+    var onShopItemClickListener: ((ShopItem) -> Unit)? = null
 
     var shopItemList = listOf<ShopItem>()
         set(value) {
@@ -46,6 +47,10 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
             onShopItemLongClickListener?.invoke(shopItem)
             true
         }
+        holder.itemView.setOnClickListener {
+            onShopItemClickListener?.invoke(shopItem)
+        }
+
     }
 
     override fun getItemCount(): Int {

@@ -1,8 +1,10 @@
 package com.countlesswrongs.myshoppinglist.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.countlesswrongs.myshoppinglist.R
 import com.countlesswrongs.myshoppinglist.presentation.adapter.ShopListAdapter
@@ -38,12 +40,43 @@ class MainActivity : AppCompatActivity() {
                 ShopListAdapter.MAX_POOL_SIZE
             )
         }
+        setupLongClickListener()
+        setupClickListener()
+        setupSwipeListener(recyclerViewItemsList)
+    }
 
+    private fun setupSwipeListener(recyclerViewItemsList: RecyclerView) {
+        val callback = object :
+            ItemTouchHelper.SimpleCallback(
+                0,
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val item = shopListAdapter.shopItemList[viewHolder.adapterPosition]
+                viewModel.deleteShopItem(item)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(recyclerViewItemsList)
+    }
+
+    private fun setupClickListener() {
+        shopListAdapter.onShopItemClickListener = {
+            Log.d("MainActivity", it.toString())
+        }
+    }
+
+    private fun setupLongClickListener() {
         shopListAdapter.onShopItemLongClickListener = {
             viewModel.changeShopItemStatus(it)
         }
-
     }
-
 }
-
