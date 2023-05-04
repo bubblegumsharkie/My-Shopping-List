@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.countlesswrongs.myshoppinglist.R
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
+import com.countlesswrongs.myshoppinglist.presentation.utils.ShopListDiffCallback
 
 class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>() {
 
@@ -22,8 +24,10 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 
     var shopItemList = listOf<ShopItem>()
         set(value) {
+            val callback = ShopListDiffCallback(shopItemList, value)
+            val diffResult = DiffUtil.calculateDiff(callback)
+            diffResult.dispatchUpdatesTo(this)
             field = value
-            notifyDataSetChanged()
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
