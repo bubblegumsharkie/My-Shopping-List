@@ -1,4 +1,4 @@
-package com.countlesswrongs.myshoppinglist.presentation
+package com.countlesswrongs.myshoppinglist.presentation.activity
 
 import android.os.Bundle
 import android.util.Log

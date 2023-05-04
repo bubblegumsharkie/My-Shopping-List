@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">My Shopping List</string>
     <string name="cd_add_a_new_item">Add a new item</string>
+    <string name="hint_name">Name:</string>
+    <string name="hint_amount">Amount:</string>
+    <string name="button_save">Save</string>
 </resources>
