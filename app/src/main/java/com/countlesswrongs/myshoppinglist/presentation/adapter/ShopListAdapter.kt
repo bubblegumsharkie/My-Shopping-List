@@ -5,11 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.countlesswrongs.myshoppinglist.R
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
+import com.countlesswrongs.myshoppinglist.presentation.utils.ShopItemDiffCallback
 
-class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>() {
+class ShopListAdapter :
+    ListAdapter<ShopItem, ShopListAdapter.ShopItemViewHolder>(ShopItemDiffCallback()) {
 
     companion object {
         const val VIEW_TYPE_ENABLED = 101
@@ -19,12 +22,6 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 
     var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
     var onShopItemClickListener: ((ShopItem) -> Unit)? = null
-
-    var shopItemList = listOf<ShopItem>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
         val layoutId =
@@ -40,7 +37,7 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
     }
 
     override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
-        val shopItem = shopItemList[position]
+        val shopItem = getItem(position)
         holder.textViewItemName.text = shopItem.name
         holder.textViewItemCount.text = shopItem.amount.toString()
         holder.itemView.setOnLongClickListener {
@@ -53,12 +50,8 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 
     }
 
-    override fun getItemCount(): Int {
-        return shopItemList.size
-    }
-
     override fun getItemViewType(position: Int): Int {
-        return if (shopItemList[position].enabled) {
+        return if (getItem(position).enabled) {
             VIEW_TYPE_ENABLED
         } else {
             VIEW_TYPE_DISABLED
