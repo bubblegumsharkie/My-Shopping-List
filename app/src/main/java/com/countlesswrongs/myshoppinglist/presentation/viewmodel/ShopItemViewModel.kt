@@ -1,5 +1,6 @@
 package com.countlesswrongs.myshoppinglist.presentation.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.countlesswrongs.myshoppinglist.data.ShopListRepositoryImpl
@@ -8,7 +9,7 @@ import com.countlesswrongs.myshoppinglist.domain.usecase.AddShopItemUseCase
 import com.countlesswrongs.myshoppinglist.domain.usecase.EditShopItemUseCase
 import com.countlesswrongs.myshoppinglist.domain.usecase.GetShopItemByIdUseCase
 
-class ShopItemVIewModel : ViewModel() {
+class ShopItemViewModel : ViewModel() {
 
     private val repository = ShopListRepositoryImpl
 
@@ -16,31 +17,50 @@ class ShopItemVIewModel : ViewModel() {
     private val addShopItemUseCase = AddShopItemUseCase(repository)
     private val editShopItemUseCase = EditShopItemUseCase(repository)
 
-    val errorInputAmount = MutableLiveData<Boolean>(false)
+    private val _errorInputAmount = MutableLiveData<Boolean>()
+    val errorInputAmount: LiveData<Boolean>
+        get() = _errorInputAmount
+
+    private val _errorInputName = MutableLiveData<Boolean>()
+    val errorInputName: LiveData<Boolean>
+        get() = _errorInputName
+
+    private val _currentShopItem = MutableLiveData<ShopItem>()
+    val currentShopItem: LiveData<ShopItem>
+        get() = _currentShopItem
+
+    private val _shouldCloseScreen = MutableLiveData<Unit>()
+    val shouldCloseScreen: LiveData<Unit>
+        get() = _shouldCloseScreen
 
     fun getShopItem(shopItemId: Int) {
         val item = getShopItemUseCase.getShopItem(shopItemId)
+        _currentShopItem.value = item
     }
 
     fun addShopItem(inputName: String?, inputAmount: String?) {
-        errorInputAmount.value = false
+        _errorInputAmount.value = false
         val name = parseName(inputName)
         val amount = parseAmount(inputAmount)
         val fieldsValid = validateInput(name, amount)
         if (fieldsValid) {
             val shopItem = ShopItem(name, amount, true)
             addShopItemUseCase.addShopItem(shopItem)
+            finishWork()
         }
     }
 
     fun editShopItem(inputName: String?, inputAmount: String?) {
-        errorInputAmount.value = false
+        _errorInputAmount.value = false
         val name = parseName(inputName)
         val amount = parseAmount(inputAmount)
         val fieldsValid = validateInput(name, amount)
         if (fieldsValid) {
-            val shopItem = ShopItem(name, amount, true)
-            editShopItemUseCase.editShopItem(shopItem)
+            _currentShopItem.value?.let {
+                val shopItem = it.copy(name = name, amount = amount)
+                editShopItemUseCase.editShopItem(shopItem)
+                finishWork()
+            }
         }
     }
 
@@ -57,7 +77,7 @@ class ShopItemVIewModel : ViewModel() {
             inputAmount?.trim()?.toInt() ?: 0
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
-            errorInputAmount.value = true
+            _errorInputAmount.value = true
             return 0
         }
     }
@@ -66,13 +86,25 @@ class ShopItemVIewModel : ViewModel() {
         var result = true
         if (name.isBlank()) {
             result = false
-            //TODO: Show name input error
+            _errorInputName.value = true
         }
-        if (amount <=0) {
+        if (amount <= 0) {
             result = false
-            //TODO: Show name input error
+            _errorInputAmount.value = true
         }
         return result
+    }
+
+    fun resetInputNameError() {
+        _errorInputName.value = false
+    }
+
+    fun resetInputAmountError() {
+        _errorInputAmount.value = false
+    }
+
+    private fun finishWork() {
+        _shouldCloseScreen.value = Unit
     }
 
 }
