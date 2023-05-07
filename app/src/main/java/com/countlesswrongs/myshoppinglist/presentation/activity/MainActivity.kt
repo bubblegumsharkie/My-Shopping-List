@@ -9,11 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.countlesswrongs.myshoppinglist.R
 import com.countlesswrongs.myshoppinglist.presentation.adapter.ShopListAdapter
 import com.countlesswrongs.myshoppinglist.presentation.viewmodel.MainViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
+
+    private lateinit var buttonAddItem: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +25,12 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopList.observe(this) {
             shopListAdapter.submitList(it)
+        }
+        buttonAddItem = findViewById(R.id.buttonAddItem)
+
+        buttonAddItem.setOnClickListener {
+            val intent = ShopItemActivity.newIntentAddShopItem(this)
+            startActivity(intent)
         }
     }
 
@@ -71,6 +80,8 @@ class MainActivity : AppCompatActivity() {
     private fun setupClickListener() {
         shopListAdapter.onShopItemClickListener = {
             Log.d("MainActivity", it.toString())
+            val intent = ShopItemActivity.newIntentEditShopItem(this, it.id)
+            startActivity(intent)
         }
     }
 

@@ -4,4 +4,6 @@
     <string name="hint_name">Name:</string>
     <string name="hint_amount">Amount:</string>
     <string name="button_save">Save</string>
+    <string name="errror_amount">Amount you\'ve entered is incorrect</string>
+    <string name="errror_name">Name you\'ve entered is incorrect</string>
 </resources>

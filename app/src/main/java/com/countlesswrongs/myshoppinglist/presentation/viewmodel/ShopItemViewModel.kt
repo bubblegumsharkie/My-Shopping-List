@@ -38,8 +38,13 @@ class ShopItemViewModel : ViewModel() {
         _currentShopItem.value = item
     }
 
+    private fun editShopItem(shopItem: ShopItem) {
+        editShopItemUseCase.editShopItem(shopItem)
+    }
+
     fun addShopItem(inputName: String?, inputAmount: String?) {
-        _errorInputAmount.value = false
+        resetInputNameError()
+        resetInputAmountError()
         val name = parseName(inputName)
         val amount = parseAmount(inputAmount)
         val fieldsValid = validateInput(name, amount)
@@ -51,21 +56,18 @@ class ShopItemViewModel : ViewModel() {
     }
 
     fun editShopItem(inputName: String?, inputAmount: String?) {
-        _errorInputAmount.value = false
+        resetInputNameError()
+        resetInputAmountError()
         val name = parseName(inputName)
         val amount = parseAmount(inputAmount)
         val fieldsValid = validateInput(name, amount)
         if (fieldsValid) {
             _currentShopItem.value?.let {
                 val shopItem = it.copy(name = name, amount = amount)
-                editShopItemUseCase.editShopItem(shopItem)
+                editShopItem(shopItem)
                 finishWork()
             }
         }
-    }
-
-    fun editShopItem(shopItem: ShopItem) {
-        editShopItemUseCase.editShopItem(shopItem)
     }
 
     private fun parseName(inputName: String?): String {
