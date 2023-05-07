@@ -3,6 +3,8 @@ package com.countlesswrongs.myshoppinglist.presentation.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -31,20 +33,29 @@ class ShopItemActivity : AppCompatActivity() {
         parseIntent()
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
         initViews()
+        pickLaunchMode()
+        observeViewModel()
+    }
+
+    private fun pickLaunchMode() {
         when (screenMode) {
             MODE_EDIT -> launchEditMode()
             MODE_ADD -> launchAddMode()
         }
     }
 
+    private fun observeViewModel() {
+        listenToFieldsTextChangeAndResetErrors()
+        listenToErrors()
+        listenShouldCloseScreen()
+    }
+
     private fun launchAddMode() {
         buttonSave.setOnClickListener {
-            val name = editTextName.text.toString()
-            val amount = editTextAmount.text.toString()
+            val name = editTextName.text?.toString()
+            val amount = editTextAmount.text?.toString()
             viewModel.addShopItem(name, amount)
-            finish()
         }
-        TODO("Implement error messages")
     }
 
     private fun launchEditMode() {
@@ -54,12 +65,65 @@ class ShopItemActivity : AppCompatActivity() {
             editTextAmount.setText(it.amount.toString())
         }
         buttonSave.setOnClickListener {
-            val name = editTextName.text.toString()
-            val amount = editTextAmount.text.toString()
+            val name = editTextName.text?.toString()
+            val amount = editTextAmount.text?.toString()
             viewModel.editShopItem(name, amount)
+        }
+    }
+
+    private fun listenToFieldsTextChangeAndResetErrors() {
+        editTextName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                textInputLayoutName.error = null
+                viewModel.resetInputNameError()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+        })
+
+        editTextAmount.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetInputAmountError()
+                textInputLayoutAmount.error = null
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+        })
+    }
+
+    private fun listenShouldCloseScreen() {
+        viewModel.shouldCloseScreen.observe(this) {
             finish()
         }
-        TODO("Implement error messages")
+    }
+
+    private fun listenToErrors() {
+        viewModel.errorInputName.observe(this) {
+            val message = if (it) {
+                getString(R.string.errror_name)
+            } else {
+                null
+            }
+            textInputLayoutName.error = message
+        }
+        viewModel.errorInputAmount.observe(this) {
+            val message = if (it) {
+                getString(R.string.errror_amount)
+            } else {
+                null
+            }
+            textInputLayoutAmount.error = message
+        }
     }
 
     private fun parseIntent() {
