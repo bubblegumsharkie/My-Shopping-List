@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.popBackStack()
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.shop_item_container, fragment)
+            .replace(R.id.shop_item_container, fragment)
             .addToBackStack(null)
             .commit()
     }
