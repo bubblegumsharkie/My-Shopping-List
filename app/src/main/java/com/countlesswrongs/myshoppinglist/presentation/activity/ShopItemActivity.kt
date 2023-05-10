@@ -8,16 +8,8 @@ import com.countlesswrongs.myshoppinglist.R
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 import com.countlesswrongs.myshoppinglist.presentation.fragment.ShopItemFragment
 
-class ShopItemActivity : AppCompatActivity() {
+class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
-    //    private lateinit var viewModel: ShopItemViewModel
-//
-//    private lateinit var textInputLayoutName: TextInputLayout
-//    private lateinit var textInputLayoutAmount: TextInputLayout
-//    private lateinit var editTextName: EditText
-//    private lateinit var editTextAmount: EditText
-//    private lateinit var buttonSave: Button
-//
     private var screenMode = MODE_UNKNOWN
     private var shopItemId = ShopItem.UNDEFINED_ID
 
@@ -25,10 +17,9 @@ class ShopItemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
         parseIntent()
-//        viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
-//        initViews()
-        launchFragmentWithMode()
-//        observeViewModel()
+        if (savedInstanceState == null) {
+            launchFragmentWithMode()
+        }
     }
 
     //
@@ -40,93 +31,10 @@ class ShopItemActivity : AppCompatActivity() {
         }
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.shop_item_container, fragment)
+            .replace(R.id.shop_item_container, fragment)
             .commit()
     }
 
-    //
-//    private fun observeViewModel() {
-//        listenToFieldsTextChangeAndResetErrors()
-//        listenToErrors()
-//        listenShouldCloseScreen()
-//    }
-//
-//    private fun launchAddMode() {
-//        buttonSave.setOnClickListener {
-//            val name = editTextName.text?.toString()
-//            val amount = editTextAmount.text?.toString()
-//            viewModel.addShopItem(name, amount)
-//        }
-//    }
-//
-//    private fun launchEditMode() {
-//        viewModel.getShopItem(shopItemId)
-//        viewModel.currentShopItem.observe(this) {
-//            editTextName.setText(it.name)
-//            editTextAmount.setText(it.amount.toString())
-//        }
-//        buttonSave.setOnClickListener {
-//            val name = editTextName.text?.toString()
-//            val amount = editTextAmount.text?.toString()
-//            viewModel.editShopItem(name, amount)
-//        }
-//    }
-//
-//    private fun listenToFieldsTextChangeAndResetErrors() {
-//        editTextName.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                textInputLayoutName.error = null
-//                viewModel.resetInputNameError()
-//            }
-//
-//            override fun afterTextChanged(s: Editable?) {
-//            }
-//
-//        })
-//
-//        editTextAmount.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                viewModel.resetInputAmountError()
-//                textInputLayoutAmount.error = null
-//            }
-//
-//            override fun afterTextChanged(s: Editable?) {
-//            }
-//
-//        })
-//    }
-//
-//    private fun listenShouldCloseScreen() {
-//        viewModel.shouldCloseScreen.observe(this) {
-//            finish()
-//        }
-//    }
-//
-//    private fun listenToErrors() {
-//        viewModel.errorInputName.observe(this) {
-//            val message = if (it) {
-//                getString(R.string.errror_name)
-//            } else {
-//                null
-//            }
-//            textInputLayoutName.error = message
-//        }
-//        viewModel.errorInputAmount.observe(this) {
-//            val message = if (it) {
-//                getString(R.string.errror_amount)
-//            } else {
-//                null
-//            }
-//            textInputLayoutAmount.error = message
-//        }
-//    }
-//
     private fun parseIntent() {
         if (!intent.hasExtra(EXTRA_SCREEN_MODE)) {
             throw RuntimeException("Screen mode extra was not found")
@@ -144,15 +52,6 @@ class ShopItemActivity : AppCompatActivity() {
         }
     }
 
-    //
-//    private fun initViews() {
-//        textInputLayoutName = findViewById(R.id.textInputLayoutName)
-//        textInputLayoutAmount = findViewById(R.id.textInputLayoutAmount)
-//        editTextName = findViewById(R.id.editTextName)
-//        editTextAmount = findViewById(R.id.editTextAmount)
-//        buttonSave = findViewById(R.id.buttonSave)
-//    }
-//
     companion object {
 
         private const val EXTRA_SCREEN_MODE = "extra_mode"
@@ -173,6 +72,10 @@ class ShopItemActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_SHOP_ITEM_ID, shopItemId)
             return intent
         }
+    }
+
+    override fun onEditingFinished() {
+        finish()
     }
 
 }

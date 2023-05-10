@@ -1,5 +1,6 @@
 package com.countlesswrongs.myshoppinglist.presentation.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -18,6 +19,7 @@ import com.google.android.material.textfield.TextInputLayout
 class ShopItemFragment : Fragment() {
 
     private lateinit var viewModel: ShopItemViewModel
+    private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
     private lateinit var textInputLayoutName: TextInputLayout
     private lateinit var textInputLayoutAmount: TextInputLayout
@@ -28,6 +30,15 @@ class ShopItemFragment : Fragment() {
 
     private var screenMode: String = MODE_UNKNOWN
     private var shopItemId: Int = ShopItem.UNDEFINED_ID
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnEditingFinishedListener) {
+            onEditingFinishedListener = context
+        } else {
+            throw RuntimeException("Activity must implement OnEditingFinishedListener")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,7 +127,7 @@ class ShopItemFragment : Fragment() {
 
     private fun listenShouldCloseScreen() {
         viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
-            activity?.onBackPressedDispatcher?.onBackPressed()
+            onEditingFinishedListener.onEditingFinished()
         }
     }
 
@@ -164,6 +175,10 @@ class ShopItemFragment : Fragment() {
         editTextName = view.findViewById(R.id.editTextName)
         editTextAmount = view.findViewById(R.id.editTextAmount)
         buttonSave = view.findViewById(R.id.buttonSave)
+    }
+
+    interface OnEditingFinishedListener {
+        fun onEditingFinished()
     }
 
     companion object {
