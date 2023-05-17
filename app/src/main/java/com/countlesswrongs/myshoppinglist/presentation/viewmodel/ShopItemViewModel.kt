@@ -1,17 +1,18 @@
 package com.countlesswrongs.myshoppinglist.presentation.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.countlesswrongs.myshoppinglist.data.ShopListRepositoryImpl
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 import com.countlesswrongs.myshoppinglist.domain.usecase.AddShopItemUseCase
 import com.countlesswrongs.myshoppinglist.domain.usecase.EditShopItemUseCase
 import com.countlesswrongs.myshoppinglist.domain.usecase.GetShopItemByIdUseCase
 
-class ShopItemViewModel : ViewModel() {
+class ShopItemViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = ShopListRepositoryImpl
+    private val repository = ShopListRepositoryImpl(application)
 
     private val getShopItemUseCase = GetShopItemByIdUseCase(repository)
     private val addShopItemUseCase = AddShopItemUseCase(repository)
