@@ -9,10 +9,16 @@ import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 import com.countlesswrongs.myshoppinglist.domain.usecase.AddShopItemUseCase
 import com.countlesswrongs.myshoppinglist.domain.usecase.EditShopItemUseCase
 import com.countlesswrongs.myshoppinglist.domain.usecase.GetShopItemByIdUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class ShopItemViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = ShopListRepositoryImpl(application)
+
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     private val getShopItemUseCase = GetShopItemByIdUseCase(repository)
     private val addShopItemUseCase = AddShopItemUseCase(repository)
@@ -35,12 +41,16 @@ class ShopItemViewModel(application: Application) : AndroidViewModel(application
         get() = _shouldCloseScreen
 
     fun getShopItem(shopItemId: Int) {
-        val item = getShopItemUseCase.getShopItem(shopItemId)
-        _currentShopItem.value = item
+        scope.launch {
+            val item = getShopItemUseCase.getShopItem(shopItemId)
+            _currentShopItem.value = item
+        }
     }
 
     private fun editShopItem(shopItem: ShopItem) {
-        editShopItemUseCase.editShopItem(shopItem)
+        scope.launch {
+            editShopItemUseCase.editShopItem(shopItem)
+        }
     }
 
     fun addShopItem(inputName: String?, inputAmount: String?) {
@@ -50,9 +60,11 @@ class ShopItemViewModel(application: Application) : AndroidViewModel(application
         val amount = parseAmount(inputAmount)
         val fieldsValid = validateInput(name, amount)
         if (fieldsValid) {
-            val shopItem = ShopItem(name, amount, true)
-            addShopItemUseCase.addShopItem(shopItem)
-            finishWork()
+            scope.launch {
+                val shopItem = ShopItem(name, amount, true)
+                addShopItemUseCase.addShopItem(shopItem)
+                finishWork()
+            }
         }
     }
 
@@ -64,9 +76,11 @@ class ShopItemViewModel(application: Application) : AndroidViewModel(application
         val fieldsValid = validateInput(name, amount)
         if (fieldsValid) {
             _currentShopItem.value?.let {
-                val shopItem = it.copy(name = name, amount = amount)
-                editShopItem(shopItem)
-                finishWork()
+                scope.launch {
+                    val shopItem = it.copy(name = name, amount = amount)
+                    editShopItem(shopItem)
+                    finishWork()
+                }
             }
         }
     }
@@ -108,6 +122,11 @@ class ShopItemViewModel(application: Application) : AndroidViewModel(application
 
     private fun finishWork() {
         _shouldCloseScreen.value = Unit
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        scope.cancel()
     }
 
 }
