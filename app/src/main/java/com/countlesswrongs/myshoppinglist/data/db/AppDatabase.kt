@@ -4,10 +4,13 @@ import android.app.Application
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.countlesswrongs.myshoppinglist.data.dao.ShopListDao
 import com.countlesswrongs.myshoppinglist.data.entity.ShopItemDbModel
 
 @Database(entities = [ShopItemDbModel::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
+
+    abstract fun shopListDao(): ShopListDao
 
     companion object {
         private var INSTANCE: AppDatabase? = null
