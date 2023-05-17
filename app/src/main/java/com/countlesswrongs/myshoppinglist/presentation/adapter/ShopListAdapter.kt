@@ -2,12 +2,14 @@ package com.countlesswrongs.myshoppinglist.presentation.adapter
 
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.countlesswrongs.myshoppinglist.R
+import com.countlesswrongs.myshoppinglist.databinding.ItemShopDisabledBinding
+import com.countlesswrongs.myshoppinglist.databinding.ItemShopEnabledBinding
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 import com.countlesswrongs.myshoppinglist.presentation.utils.ShopItemDiffCallback
 
@@ -30,21 +32,35 @@ class ShopListAdapter :
                 VIEW_TYPE_ENABLED -> R.layout.item_shop_enabled
                 else -> throw RuntimeException("Unknown view type: $viewType")
             }
-        val view = LayoutInflater
-            .from(parent.context)
-            .inflate(layoutId, parent, false)
-        return ShopItemViewHolder(view)
+        val binding = DataBindingUtil.inflate<ViewDataBinding>(
+            LayoutInflater.from(parent.context),
+            layoutId,
+            parent,
+            false
+        )
+        return ShopItemViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
         val shopItem = getItem(position)
-        holder.textViewItemName.text = shopItem.name
-        holder.textViewItemCount.text = shopItem.amount.toString()
-        holder.itemView.setOnLongClickListener {
+        val binding = holder.binding
+
+        when (binding) {
+            is ItemShopDisabledBinding  -> {
+                binding.textViewItemName.text = shopItem.name
+                binding.textViewItemCount.text = shopItem.amount.toString()
+            }
+            is ItemShopEnabledBinding -> {
+                binding.textViewItemName.text = shopItem.name
+                binding.textViewItemCount.text = shopItem.amount.toString()
+            }
+        }
+
+        binding.root.setOnLongClickListener {
             onShopItemLongClickListener?.invoke(shopItem)
             true
         }
-        holder.itemView.setOnClickListener {
+        binding.root.setOnClickListener {
             onShopItemClickListener?.invoke(shopItem)
         }
 
@@ -58,9 +74,8 @@ class ShopListAdapter :
         }
     }
 
-    class ShopItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textViewItemName: TextView = view.findViewById(R.id.textViewItemName)
-        val textViewItemCount: TextView = view.findViewById(R.id.textViewItemCount)
-    }
+    class ShopItemViewHolder(
+        val binding: ViewDataBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
 }
