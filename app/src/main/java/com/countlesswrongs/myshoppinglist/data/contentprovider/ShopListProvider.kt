@@ -11,6 +11,7 @@ class ShopListProvider : ContentProvider() {
 
     private val uriMatcher = UriMatcher(UriMatcher.NO_MATCH).apply {
         addURI("com.countlesswrongs.myshoppinglist", "shop_items", GET_SHOP_ITEMS_QUERY)
+        addURI("com.countlesswrongs.myshoppinglist", "shop_items/#", GET_SHOP_ITEMS_QUERY_ID)
 
         // shop_items/# for numbers, shop_items/* for strings
     }
@@ -61,6 +62,7 @@ class ShopListProvider : ContentProvider() {
 
     companion object {
         private const val GET_SHOP_ITEMS_QUERY = 100
+        private const val GET_SHOP_ITEMS_QUERY_ID = 101
     }
 
 }
