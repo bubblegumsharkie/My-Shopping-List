@@ -2,8 +2,9 @@ package com.countlesswrongs.myshoppinglist.data.utils
 
 import com.countlesswrongs.myshoppinglist.data.entity.ShopItemDbModel
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
+import javax.inject.Inject
 
-class ShopListMapper {
+class ShopListMapper @Inject constructor() {
 
     fun mapEntityToDbModel(shopItem: ShopItem) = ShopItemDbModel(
         id = shopItem.id,

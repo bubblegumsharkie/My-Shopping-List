@@ -11,12 +11,22 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.countlesswrongs.myshoppinglist.databinding.FragmentShopItemBinding
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
+import com.countlesswrongs.myshoppinglist.presentation.ShopApplication
 import com.countlesswrongs.myshoppinglist.presentation.viewmodel.ShopItemViewModel
+import com.countlesswrongs.myshoppinglist.presentation.viewmodel.ViewModelFactory
+import javax.inject.Inject
 
 class ShopItemFragment : Fragment() {
 
     private lateinit var viewModel: ShopItemViewModel
     private lateinit var onEditingFinishedListener: OnEditingFinishedListener
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val component by lazy {
+        (requireActivity().application as ShopApplication).component
+    }
 
     private var _binding: FragmentShopItemBinding? = null
     private val binding: FragmentShopItemBinding
@@ -27,6 +37,8 @@ class ShopItemFragment : Fragment() {
     private var shopItemId: Int = ShopItem.UNDEFINED_ID
 
     override fun onAttach(context: Context) {
+        component.inject(this)
+
         super.onAttach(context)
         if (context is OnEditingFinishedListener) {
             onEditingFinishedListener = context
@@ -51,11 +63,15 @@ class ShopItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
+        getViewModel()
         pickLaunchMode()
         observeViewModel()
+    }
+
+    private fun getViewModel() {
+        viewModel = ViewModelProvider(this, viewModelFactory)[ShopItemViewModel::class.java]
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
     }
 
     private fun pickLaunchMode() {

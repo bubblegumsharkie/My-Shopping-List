@@ -9,9 +9,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.countlesswrongs.myshoppinglist.R
 import com.countlesswrongs.myshoppinglist.databinding.ActivityMainBinding
+import com.countlesswrongs.myshoppinglist.presentation.ShopApplication
 import com.countlesswrongs.myshoppinglist.presentation.adapter.ShopListAdapter
 import com.countlesswrongs.myshoppinglist.presentation.fragment.ShopItemFragment
 import com.countlesswrongs.myshoppinglist.presentation.viewmodel.MainViewModel
+import com.countlesswrongs.myshoppinglist.presentation.viewmodel.ViewModelFactory
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
@@ -19,13 +22,22 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
     private lateinit var shopListAdapter: ShopListAdapter
     private lateinit var binding: ActivityMainBinding
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val component by lazy {
+        (application as ShopApplication).component
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        component.inject(this)
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupRecyclerView()
-        observeViewModel()
+        getAndObserveViewModel()
         setOnClickListeners()
     }
 
@@ -40,8 +52,8 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
         }
     }
 
-    private fun observeViewModel() {
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+    private fun getAndObserveViewModel() {
+        viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         viewModel.shopList.observe(this) {
             shopListAdapter.submitList(it)
         }

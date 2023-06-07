@@ -1,17 +1,17 @@
 package com.countlesswrongs.myshoppinglist.data
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
-import com.countlesswrongs.myshoppinglist.data.db.AppDatabase
+import com.countlesswrongs.myshoppinglist.data.dao.ShopListDao
 import com.countlesswrongs.myshoppinglist.data.utils.ShopListMapper
 import com.countlesswrongs.myshoppinglist.domain.ShopListRepository
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
+import javax.inject.Inject
 
-class ShopListRepositoryImpl(application: Application) : ShopListRepository {
-
-    private val shopListDao = AppDatabase.getInstance(application).shopListDao()
-    private val mapper = ShopListMapper()
+class ShopListRepositoryImpl @Inject constructor(
+    private val shopListDao: ShopListDao,
+    private val mapper: ShopListMapper
+) : ShopListRepository {
 
     override fun getShopItemList(): LiveData<List<ShopItem>> {
         return shopListDao.getShopList().map {
