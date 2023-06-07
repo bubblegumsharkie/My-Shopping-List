@@ -1,5 +1,6 @@
 package com.countlesswrongs.myshoppinglist.presentation.activity
 
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -39,6 +40,15 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
         setupRecyclerView()
         getAndObserveViewModel()
         setOnClickListeners()
+
+        contentResolver.query(
+            Uri.parse("content://com.countlesswrongs.myshoppinglist/shop_items"),
+            null,
+            null,
+            null,
+            null,
+            null
+        )
     }
 
     private fun setOnClickListeners() {
