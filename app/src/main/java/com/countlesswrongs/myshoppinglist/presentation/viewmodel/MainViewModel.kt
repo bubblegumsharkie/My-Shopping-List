@@ -1,22 +1,19 @@
 package com.countlesswrongs.myshoppinglist.presentation.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.countlesswrongs.myshoppinglist.data.ShopListRepositoryImpl
 import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 import com.countlesswrongs.myshoppinglist.domain.usecase.DeleteShopItemUseCase
 import com.countlesswrongs.myshoppinglist.domain.usecase.EditShopItemUseCase
 import com.countlesswrongs.myshoppinglist.domain.usecase.GetShopItemListUseCase
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = ShopListRepositoryImpl(application)
-
-    private val getShopItemListUseCase = GetShopItemListUseCase(repository)
-    private val deleteShopItemUseCase = DeleteShopItemUseCase(repository)
-    private val editShopItemUseCase = EditShopItemUseCase(repository)
+class MainViewModel @Inject constructor(
+    private val getShopItemListUseCase: GetShopItemListUseCase,
+    private val deleteShopItemUseCase: DeleteShopItemUseCase,
+    private val editShopItemUseCase: EditShopItemUseCase
+) : ViewModel() {
 
     val shopList = getShopItemListUseCase.getShopItemList()
 
