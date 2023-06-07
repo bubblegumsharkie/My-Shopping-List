@@ -6,6 +6,8 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import com.countlesswrongs.myshoppinglist.data.dao.ShopListDao
+import com.countlesswrongs.myshoppinglist.data.utils.ShopListMapper
+import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 import com.countlesswrongs.myshoppinglist.presentation.ShopApplication
 import javax.inject.Inject
 
@@ -17,6 +19,9 @@ class ShopListProvider : ContentProvider() {
 
     @Inject
     lateinit var shopListDao: ShopListDao
+
+    @Inject
+    lateinit var mapper: ShopListMapper
 
     private val uriMatcher = UriMatcher(UriMatcher.NO_MATCH).apply {
         addURI("com.countlesswrongs.myshoppinglist", "shop_items", GET_SHOP_ITEMS_QUERY)
@@ -52,7 +57,18 @@ class ShopListProvider : ContentProvider() {
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        TODO("Not yet implemented")
+        when (uriMatcher.match(uri)) {
+            GET_SHOP_ITEMS_QUERY -> {
+                if (values == null) return null
+                val id = values.getAsInteger("id")
+                val name = values.getAsString("name")
+                val amount = values.getAsInteger("amount")
+                val enabled = values.getAsBoolean("enabled")
+                val shopItem = ShopItem(name, amount, enabled, id)
+                shopListDao.addShopItemSync(mapper.mapEntityToDbModel(shopItem))
+            }
+        }
+        return null
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {

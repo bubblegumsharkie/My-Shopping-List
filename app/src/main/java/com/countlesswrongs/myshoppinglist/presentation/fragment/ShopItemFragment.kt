@@ -1,6 +1,8 @@
 package com.countlesswrongs.myshoppinglist.presentation.fragment
 
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +17,7 @@ import com.countlesswrongs.myshoppinglist.presentation.ShopApplication
 import com.countlesswrongs.myshoppinglist.presentation.viewmodel.ShopItemViewModel
 import com.countlesswrongs.myshoppinglist.presentation.viewmodel.ViewModelFactory
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class ShopItemFragment : Fragment() {
 
@@ -88,9 +91,21 @@ class ShopItemFragment : Fragment() {
 
     private fun launchAddMode() {
         binding.buttonSave.setOnClickListener {
-            val name = binding.editTextName.text?.toString()
-            val amount = binding.editTextAmount.text?.toString()
-            viewModel.addShopItem(name, amount)
+//            val name = binding.editTextName.text?.toString()
+//            val amount = binding.editTextAmount.text?.toString()
+//            viewModel.addShopItem(name, amount)
+
+            thread {
+                context?.contentResolver?.insert(
+                    Uri.parse("content://com.countlesswrongs.myshoppinglist/shop_items"),
+                    ContentValues().apply {
+                        put("id", 0)
+                        put("name", "this-man")
+                        put("amount", 23)
+                        put("enabled", true)
+                    }
+                )
+            }
         }
     }
 
@@ -100,7 +115,6 @@ class ShopItemFragment : Fragment() {
             val name = binding.editTextName.text?.toString()
             val amount = binding.editTextAmount.text?.toString()
             viewModel.editShopItem(name, amount)
-
         }
     }
 
