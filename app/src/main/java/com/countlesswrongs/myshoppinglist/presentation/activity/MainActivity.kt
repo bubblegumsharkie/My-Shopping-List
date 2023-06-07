@@ -2,6 +2,7 @@ package com.countlesswrongs.myshoppinglist.presentation.activity
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -10,12 +11,14 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.countlesswrongs.myshoppinglist.R
 import com.countlesswrongs.myshoppinglist.databinding.ActivityMainBinding
+import com.countlesswrongs.myshoppinglist.domain.model.ShopItem
 import com.countlesswrongs.myshoppinglist.presentation.ShopApplication
 import com.countlesswrongs.myshoppinglist.presentation.adapter.ShopListAdapter
 import com.countlesswrongs.myshoppinglist.presentation.fragment.ShopItemFragment
 import com.countlesswrongs.myshoppinglist.presentation.viewmodel.MainViewModel
 import com.countlesswrongs.myshoppinglist.presentation.viewmodel.ViewModelFactory
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
@@ -41,14 +44,27 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
         getAndObserveViewModel()
         setOnClickListeners()
 
-        contentResolver.query(
-            Uri.parse("content://com.countlesswrongs.myshoppinglist/shop_items"),
-            null,
-            null,
-            null,
-            null,
-            null
-        )
+        thread {
+            val cursor = contentResolver.query(
+                Uri.parse("content://com.countlesswrongs.myshoppinglist/shop_items"),
+                null,
+                null,
+                null,
+                null,
+                null
+            )
+
+            while (cursor?.moveToNext() == true) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val amount = cursor.getInt(cursor.getColumnIndexOrThrow("amount"))
+                val enabled = cursor.getInt(cursor.getColumnIndexOrThrow("enabled")) > 0
+
+                val shopItem = ShopItem(name, amount, enabled, id)
+                Log.d("MainActivity", shopItem.toString())
+            }
+            cursor?.close()
+        }
     }
 
     private fun setOnClickListeners() {

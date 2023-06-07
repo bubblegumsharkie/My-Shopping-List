@@ -1,6 +1,7 @@
 package com.countlesswrongs.myshoppinglist.di.component
 
 import android.app.Application
+import com.countlesswrongs.myshoppinglist.data.contentprovider.ShopListProvider
 import com.countlesswrongs.myshoppinglist.di.module.DataModule
 import com.countlesswrongs.myshoppinglist.di.module.ViewModelModule
 import com.countlesswrongs.myshoppinglist.di.scope.ApplicationScope
@@ -21,6 +22,8 @@ interface ApplicationComponent {
     fun inject(activity: MainActivity)
 
     fun inject(fragment: ShopItemFragment)
+
+    fun inject(provider: ShopListProvider)
 
     @Component.Factory
     interface Factory {
